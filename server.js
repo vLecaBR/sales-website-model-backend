@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const { connectDB } = require('./database'); // Certifique-se de que o caminho está correto
 const User = require('./User'); // Certifique-se de que o caminho está correto
 
-const app = express(); // Aqui você define a variável 'app'
+const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
@@ -58,6 +58,32 @@ app.post('/api/login', async (req, res) => {
         email: user.email,
       },
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Rota para atualizar informações do usuário
+app.put('/api/update', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const token = req.headers.authorization.split(' ')[1]; // Extrai o token do cabeçalho
+    const decoded = jwt.verify(token, 'seu_segredo'); // Verifica o token
+    const userId = decoded.id;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado!' });
+    }
+
+    // Atualiza os campos do usuário
+    user.name = name;
+    user.email = email;
+    if (password) {
+      user.password = await bcrypt.hash(password, 8); // Atualiza a senha se fornecida
+    }
+    await user.save(); // Salva as alterações
+    res.json({ message: 'Usuário atualizado com sucesso!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
