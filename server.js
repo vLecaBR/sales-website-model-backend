@@ -3,8 +3,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { connectDB } = require('./database'); // Certifique-se de que o caminho está correto
-const User = require('./User'); // Certifique-se de que o caminho está correto
+const { connectDB } = require('./config/database'); // Certifique-se de que o caminho está correto
+const User = require('./models/User'); // Certifique-se de que o caminho está correto
+const userRoutes = require('./routes/userRoutes'); // Certifique-se de que o caminho está correto
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,9 @@ app.use(bodyParser.json());
 
 // Conectar ao banco de dados
 connectDB();
+
+// Usar rotas de usuários
+app.use('/api/users', userRoutes);
 
 // Criar a tabela de usuários (caso não exista)
 const syncDatabase = async () => {
