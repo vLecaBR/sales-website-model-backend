@@ -7,6 +7,7 @@ Cadastro de Usuário: Permite que novos usuários se registrem no sistema com no
 Login: Usuários podem se autenticar usando email e senha, recebendo um token JWT.
 Atualização de Informações do Usuário: Usuários autenticados podem atualizar suas informações pessoais.
 Proteção de Rotas: Rotas sensíveis estão protegidas por autenticação, garantindo que apenas usuários logados possam acessá-las. <br>
+
 🛠️ Tecnologias Utilizadas
 
 Node.js: Ambiente de execução JavaScript no lado do servidor.
