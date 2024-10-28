@@ -1,6 +1,6 @@
 // models/Product.js
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database'); // Certifique-se de que o caminho está correto
+const { sequelize } = require('../config/database');
 
 const Product = sequelize.define('Product', {
   name: {
@@ -8,7 +8,7 @@ const Product = sequelize.define('Product', {
     allowNull: false,
   },
   price: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.FLOAT, // Use FLOAT para preços
     allowNull: false,
   },
   description: {
@@ -16,12 +16,10 @@ const Product = sequelize.define('Product', {
     allowNull: true,
   },
   conteudoCaixa: {
-    type: DataTypes.JSON,
+    type: DataTypes.JSON, // Para armazenar o conteúdo da caixa como um JSON
     allowNull: true,
   },
-}, {
-  tableName: 'products',
-  timestamps: true,
 });
 
+// Exporta o modelo de produto
 module.exports = Product;

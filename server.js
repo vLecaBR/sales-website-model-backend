@@ -4,9 +4,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { connectDB } = require('./config/database'); // Certifique-se de que o caminho está correto
-const User = require('./models/User'); // Certifique-se de que o caminho está correto
-const userRoutes = require('./routes/userRoutes'); // Certifique-se de que o caminho está correto
+const { connectDB } = require('./config/database');
+const User = require('./models/User');
+const Product = require('./models/Product'); // Importando o modelo de produto
+const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes'); // Importando as rotas de produtos
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,13 +22,17 @@ connectDB();
 // Usar rotas de usuários
 app.use('/api/users', userRoutes);
 
-// Criar a tabela de usuários (caso não exista)
+// Usar rotas de produtos
+app.use('/api/products', productRoutes); // Adicionando as rotas de produtos
+
+// Criar as tabelas no banco de dados (caso não existam)
 const syncDatabase = async () => {
-  await User.sync();
+  await User.sync(); // Sincroniza a tabela de usuários
+  await Product.sync(); // Sincroniza a tabela de produtos
 };
 syncDatabase();
 
-// Rota para cadastro
+// Rota para cadastro de usuários
 app.post('/api/cadastro', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -43,7 +49,7 @@ app.post('/api/cadastro', async (req, res) => {
   }
 });
 
-// Rota para login
+// Rota para login de usuários
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
