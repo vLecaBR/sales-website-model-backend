@@ -24,8 +24,8 @@ exports.getProductById = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, description, conteudoCaixa } = req.body;
-    const newProduct = await Product.create({ name, price, description, conteudoCaixa });
+    const { name, price, description, conteudoCaixa, image } = req.body; // Incluindo a imagem
+    const newProduct = await Product.create({ name, price, description, conteudoCaixa, image });
     res.status(201).json(newProduct);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -39,8 +39,8 @@ exports.updateProduct = async (req, res) => {
       return res.status(404).json({ message: 'Produto não encontrado!' });
     }
 
-    const { name, price, description, conteudoCaixa } = req.body;
-    await product.update({ name, price, description, conteudoCaixa });
+    const { name, price, description, conteudoCaixa, image } = req.body; // Incluindo a imagem
+    await product.update({ name, price, description, conteudoCaixa, image });
     res.json(product);
   } catch (err) {
     res.status(500).json({ message: err.message });
