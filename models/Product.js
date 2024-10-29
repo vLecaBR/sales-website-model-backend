@@ -1,25 +1,33 @@
 // models/Product.js
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const Product = sequelize.define('Product', {
+class Product extends Model {}
+
+Product.init({
   name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   price: {
-    type: DataTypes.FLOAT, // Use FLOAT para preços
+    type: DataTypes.FLOAT,
     allowNull: false,
   },
   description: {
     type: DataTypes.TEXT,
-    allowNull: true,
+    allowNull: false,
   },
   conteudoCaixa: {
-    type: DataTypes.JSON, // Para armazenar o conteúdo da caixa como um JSON
-    allowNull: true,
+    type: DataTypes.JSON, // Ou DataTypes.STRING, se você preferir armazenar como texto
+    allowNull: false,
   },
+  image: { // Adicionando o campo de imagem
+    type: DataTypes.STRING, // Armazenando a URL da imagem
+    allowNull: true, // Pode ser nulo se a imagem não for obrigatória
+  }
+}, {
+  sequelize,
+  modelName: 'Product',
 });
 
-// Exporta o modelo de produto
 module.exports = Product;
