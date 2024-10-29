@@ -1,19 +1,19 @@
-// middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1]; // Assume que o token é passado como "Bearer <token>"
+
   if (!token) {
-    return res.status(401).json({ message: 'Acesso negado. Sem token.' });
+    return res.sendStatus(401); // Não autorizado
   }
 
-  try {
-    const verified = jwt.verify(token, 'seu_segredo'); // Use o mesmo segredo que você usou no login
-    req.user = verified; // Salva as informações do usuário na requisição
-    next(); // Continua para o próximo middleware ou rota
-  } catch (err) {
-    res.status(400).json({ message: 'Token inválido.' });
-  }
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403); // Proibido
+    }
+    req.user = user; // Salva o usuário na requisição
+    next();
+  });
 };
 
-module.exports = authMiddleware;
+module.exports = authenticateToken;

@@ -1,5 +1,6 @@
 // controllers/productController.js
 const Product = require('../models/Product');
+const authenticateToken = require('../middleware/authMiddleware'); // Importando o middleware de autenticação
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -59,3 +60,6 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Middleware para autenticação
+exports.authenticateToken = authenticateToken;

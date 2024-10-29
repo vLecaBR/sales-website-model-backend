@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware'); // Ajuste o caminho se necessário
 
-router.get('/', productController.getAllProducts);
-router.get('/:id', productController.getProductById);
+// Rotas de produtos
+router.get('/', productController.getAllProducts); // Não protegido
+router.get('/:id', productController.getProductById); // Não protegido
 router.post('/', authMiddleware, productController.createProduct); // Protegido
 router.put('/:id', authMiddleware, productController.updateProduct); // Protegido
 router.delete('/:id', authMiddleware, productController.deleteProduct); // Protegido
