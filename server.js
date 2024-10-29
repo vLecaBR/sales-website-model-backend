@@ -1,4 +1,5 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -9,6 +10,8 @@ const User = require('./models/User');
 const Product = require('./models/Product'); // Importando o modelo de produto
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes'); // Importando as rotas de produtos
+
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,8 +30,13 @@ app.use('/api/products', productRoutes); // Adicionando as rotas de produtos
 
 // Criar as tabelas no banco de dados (caso não existam)
 const syncDatabase = async () => {
-  await User.sync(); // Sincroniza a tabela de usuários
-  await Product.sync(); // Sincroniza a tabela de produtos
+  try {
+    await User.sync(); // Sincroniza a tabela de usuários
+    await Product.sync(); // Sincroniza a tabela de produtos
+    console.log('Tabelas criadas ou atualizadas com sucesso.');
+  } catch (error) {
+    console.error('Erro ao criar ou atualizar as tabelas:', error);
+  }
 };
 syncDatabase();
 

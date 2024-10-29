@@ -1,6 +1,6 @@
 // controllers/productController.js
 const Product = require('../models/Product');
-const authenticateToken = require('../middleware/authMiddleware'); // Importando o middleware de autenticação
+const authenticateToken = require('../middlewares/authMiddleware'); // Importando o middleware de autenticação
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -23,15 +23,19 @@ exports.getProductById = async (req, res) => {
   }
 };
 
+// controllers/productController.js
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, description, conteudoCaixa, image } = req.body; // Incluindo a imagem
+    const { name, price, description, conteudoCaixa, image } = req.body; // Capturando os dados do produto
     const newProduct = await Product.create({ name, price, description, conteudoCaixa, image });
     res.status(201).json(newProduct);
   } catch (err) {
+    console.error('Erro ao criar produto:', err.message); // Adicionando log de erro
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 exports.updateProduct = async (req, res) => {
   try {
@@ -47,6 +51,7 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteProduct = async (req, res) => {
   try {

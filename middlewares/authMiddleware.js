@@ -1,17 +1,19 @@
+// middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
 const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1]; // Assume que o token é passado como "Bearer <token>"
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Extrai o token após "Bearer "
 
   if (!token) {
-    return res.sendStatus(401); // Não autorizado
+    return res.status(401).json({ message: 'Token não fornecido.' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo', (err, user) => {
     if (err) {
-      return res.sendStatus(403); // Proibido
+      return res.status(403).json({ message: 'Token inválido.' });
     }
-    req.user = user; // Salva o usuário na requisição
+    req.user = user;
     next();
   });
 };
