@@ -21,7 +21,7 @@ module.exports = {
       },
       role: {
         type: Sequelize.STRING,
-        defaultValue: 'user', // Papel padrão
+        defaultValue: 'user', // Se não for fornecido, assume 'user'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -33,6 +33,7 @@ module.exports = {
       },
     });
   },
+
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Users');
   },

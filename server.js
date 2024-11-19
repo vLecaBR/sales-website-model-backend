@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { connectDB } = require('./config/database');
+const { connectDB, sequelize } = require('./config/database');  // Importa o sequelize corretamente
 const User = require('./models/User');
 const Product = require('./models/Product');
 const userRoutes = require('./routes/userRoutes');
@@ -15,77 +15,85 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
+app.use(express.json());  // Middleware para lidar com o corpo da requisição como JSON
 
-// Conectar ao banco de dados
-connectDB();
+// Conectar ao banco de dados antes de iniciar o servidor
+connectDB().then(() => {
+  console.log('Conexão com o banco de dados estabelecida com sucesso.');
+  
+  // Sincronizar as tabelas depois que a conexão for bem-sucedida
+  const syncDatabase = async () => {
+    try {
+      await User.sync();     // Sincroniza a tabela User
+      await Product.sync({ alter: true });  // Força a atualização da tabela Product
+      console.log('Tabelas criadas ou atualizadas com sucesso.');
+    } catch (error) {
+      console.error('Erro ao criar ou atualizar as tabelas:', error);
+    }
+  };
+  syncDatabase();
+  
+  
 
-// Configuração do AdminJS com autenticação
-(async () => {
-  try {
-    const { default: AdminJS } = await import('adminjs');
-    const AdminJSExpress = await import('@adminjs/express');
-    const AdminJSSequelize = await import('@adminjs/sequelize');
+  // Usar rotas de usuários e produtos
+  app.use('/api/users', userRoutes);
+  app.use('/api/products', productRoutes);
 
-    // Registrar o adaptador do Sequelize
-    AdminJS.registerAdapter(AdminJSSequelize);
+  // Configuração do AdminJS com autenticação
+  (async () => {
+    try {
+      const { default: AdminJS } = await import('adminjs');
+      const AdminJSExpress = await import('@adminjs/express');
+      const AdminJSSequelize = await import('@adminjs/sequelize');
 
-    // Configuração do painel AdminJS
-    const adminJs = new AdminJS({
-      databases: [],  // Ajuste se necessário para incluir o banco de dados
-      resources: [User, Product],  // Adicione aqui seus recursos (modelos)
-      rootPath: '/admin',
-    });
+      // Registrar o adaptador do Sequelize
+      AdminJS.registerAdapter(AdminJSSequelize);
 
-    // Configuração da autenticação para o painel
-    const adminJsRouter = AdminJSExpress.buildAuthenticatedRouter(
-      adminJs,
-      {
-        authenticate: async (email, password) => {
-          // Validar as credenciais para o painel admin
-          const user = await User.findOne({ where: { email } });
-          if (user && password === process.env.ADMIN_PASSWORD) {
-            return user; // Retorna o usuário para autenticação
-          }
-          return null; // Se não encontrado ou senha incorreta
+      // Configuração do painel AdminJS
+      const adminJs = new AdminJS({
+        databases: [sequelize],  // Adiciona o sequelize aqui para o AdminJS
+        resources: [User, Product],  // Adiciona seus modelos ao painel
+        rootPath: '/admin',
+      });
+
+      // Configuração da autenticação para o painel
+      const adminJsRouter = AdminJSExpress.buildAuthenticatedRouter(
+        adminJs,
+        {
+          authenticate: async (email, password) => {
+            // Validar as credenciais para o painel admin
+            const user = await User.findOne({ where: { email } });
+            if (user && password === process.env.ADMIN_PASSWORD) {
+              return user; // Retorna o usuário para autenticação
+            }
+            return null; // Se não encontrado ou senha incorreta
+          },
+          cookiePassword: process.env.COOKIE_SECRET || 'uma-senha-secreta',
         },
-        cookiePassword: process.env.COOKIE_SECRET || 'uma-senha-secreta',
-      },
-      null,
-      {
-        resave: false,
-        saveUninitialized: true,
-        secret: process.env.COOKIE_SECRET || 'uma-senha-secreta',
-      }
-    );
+        null,
+        {
+          resave: false,
+          saveUninitialized: true,
+          secret: process.env.COOKIE_SECRET || 'uma-senha-secreta',
+        }
+      );
 
-    // Protegendo o painel AdminJS com o middleware de autenticação JWT
-    app.use(adminJs.options.rootPath, adminAuthMiddleware, adminJsRouter);
+      // Protegendo o painel AdminJS com o middleware de autenticação JWT
+      app.use(adminJs.options.rootPath, adminAuthMiddleware, adminJsRouter);
 
-    console.log(`AdminJS configurado com sucesso! Acesse http://localhost:${PORT}/admin`);
-  } catch (err) {
-    console.error('Erro ao configurar AdminJS:', err);
-  }
-})();
+      console.log(`AdminJS configurado com sucesso! Acesse http://localhost:${PORT}/admin`);
+    } catch (err) {
+      console.error('Erro ao configurar AdminJS:', err);
+    }
+  })();
 
-// Usar rotas de usuários e produtos
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
-
-// Usar express.json() após as rotas do AdminJS
-app.use(express.json());  // Usando express.json() no lugar de body-parser
-
-// Sincroniza as tabelas no banco de dados
-const syncDatabase = async () => {
-  try {
-    await User.sync();     // Sincroniza a tabela User
-    await Product.sync();  // Sincroniza a tabela Product
-    console.log('Tabelas criadas ou atualizadas com sucesso.');
-  } catch (error) {
-    console.error('Erro ao criar ou atualizar as tabelas:', error);
-  }
-};
-
-syncDatabase();
+  // Inicia o servidor
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+}).catch((err) => {
+  console.error('Erro ao conectar com o banco de dados:', err);
+});
 
 // Rota para cadastro de usuários
 app.post('/api/cadastro', async (req, res) => {
@@ -124,6 +132,37 @@ app.post('/api/cadastro', async (req, res) => {
   }
 });
 
+// Rota para criar um novo produto
+// Rota para criar um novo produto
+app.post('/api/products', authenticateToken, async (req, res) => {
+  try {
+    const { name, price, description, conteudoCaixa, image } = req.body;
+
+    // Verificar se todos os campos necessários foram fornecidos
+    if (!name || !price) {
+      return res.status(400).json({ message: 'Nome e preço são obrigatórios!' });
+    }
+
+    const newProduct = await Product.create({
+      name,
+      price,
+      description,
+      conteudoCaixa,  // Campo com o conteúdo da caixa
+      image,          // Novo campo para a URL da imagem
+    });
+
+    res.status(201).json({
+      message: 'Produto criado com sucesso!',
+      product: newProduct,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erro ao criar o produto.' });
+  }
+});
+
+
+
 // Rota para login de usuários
 app.post('/api/login', async (req, res) => {
   try {
@@ -143,7 +182,6 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '1h' }
     );
     
-
     // Retorna o token e os dados do usuário, incluindo o role
     res.json({
       token,  // Token com role incluído
@@ -180,9 +218,4 @@ app.put('/api/update', authenticateToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
-
-// Inicia o servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
 });
