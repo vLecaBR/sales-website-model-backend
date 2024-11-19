@@ -3,24 +3,28 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { connectDB, sequelize } = require('./config/database');  // Importa o sequelize corretamente
+const { connectDB, sequelize } = require('./config/database');
 const User = require('./models/User');
 const Product = require('./models/Product');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const authenticateToken = require('./middlewares/authMiddleware');
 const adminAuthMiddleware = require('./middlewares/adminAuthMiddleware');
+const bodyParser = require('body-parser'); // Importando o body-parser
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());  // Middleware para lidar com o corpo da requisição como JSON
+
+// Middleware de parsing do corpo antes de configurar AdminJS
+app.use(express.json());  // Middleware de JSON
+app.use(express.urlencoded({ extended: false }));  // Middleware de URL-encoded
 
 // Conectar ao banco de dados antes de iniciar o servidor
 connectDB().then(() => {
   console.log('Conexão com o banco de dados estabelecida com sucesso.');
-  
+
   // Sincronizar as tabelas depois que a conexão for bem-sucedida
   const syncDatabase = async () => {
     try {
@@ -32,14 +36,12 @@ connectDB().then(() => {
     }
   };
   syncDatabase();
-  
-  
 
   // Usar rotas de usuários e produtos
   app.use('/api/users', userRoutes);
   app.use('/api/products', productRoutes);
 
-  // Configuração do AdminJS com autenticação
+  // **Agora, Configuração do AdminJS deve ser feita após a definição dos middlewares de JSON e URL-encoded**
   (async () => {
     try {
       const { default: AdminJS } = await import('adminjs');
@@ -61,12 +63,14 @@ connectDB().then(() => {
         adminJs,
         {
           authenticate: async (email, password) => {
-            // Validar as credenciais para o painel admin
+            // Buscar o usuário com o email informado
             const user = await User.findOne({ where: { email } });
-            if (user && password === process.env.ADMIN_PASSWORD) {
-              return user; // Retorna o usuário para autenticação
+
+            // Verificar se o usuário existe e se a senha confere
+            if (user && (await bcrypt.compare(password, user.password))) {
+              return user;  // Retorna o usuário para autenticação
             }
-            return null; // Se não encontrado ou senha incorreta
+            return null;  // Se a senha for inválida
           },
           cookiePassword: process.env.COOKIE_SECRET || 'uma-senha-secreta',
         },
@@ -79,13 +83,17 @@ connectDB().then(() => {
       );
 
       // Protegendo o painel AdminJS com o middleware de autenticação JWT
-      app.use(adminJs.options.rootPath, adminAuthMiddleware, adminJsRouter);
+      app.use(adminJs.options.rootPath, adminJsRouter);
 
       console.log(`AdminJS configurado com sucesso! Acesse http://localhost:${PORT}/admin`);
     } catch (err) {
       console.error('Erro ao configurar AdminJS:', err);
     }
   })();
+
+  // **Agora, o body-parser é configurado depois do AdminJS**
+  app.use(bodyParser.json());  // Adiciona o body-parser explicitamente
+  app.use(bodyParser.urlencoded({ extended: false }));  // Configuração do body-parser para URL-encoded
 
   // Inicia o servidor
   app.listen(PORT, () => {
@@ -133,7 +141,6 @@ app.post('/api/cadastro', async (req, res) => {
 });
 
 // Rota para criar um novo produto
-// Rota para criar um novo produto
 app.post('/api/products', authenticateToken, async (req, res) => {
   try {
     const { name, price, description, conteudoCaixa, image } = req.body;
@@ -160,8 +167,6 @@ app.post('/api/products', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Erro ao criar o produto.' });
   }
 });
-
-
 
 // Rota para login de usuários
 app.post('/api/login', async (req, res) => {
