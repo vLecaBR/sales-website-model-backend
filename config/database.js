@@ -15,4 +15,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = { sequelize, connectDB }; // Certifique-se de exportar `sequelize` e `connectDB`
+module.exports = { sequelize, connectDB }; // Exporta o sequelize e connectDB

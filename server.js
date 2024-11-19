@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { connectDB } = require('./config/database');
@@ -16,7 +15,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(bodyParser.json());
 
 // Conectar ao banco de dados
 connectDB();
@@ -33,18 +31,37 @@ connectDB();
 
     // Configuração do painel AdminJS
     const adminJs = new AdminJS({
-      databases: [], // Pode ser usado para conectar o banco inteiro
-      resources: [User, Product], // Modelos que aparecerão no painel
-      rootPath: '/admin',         // Caminho do painel
+      databases: [],  // Ajuste se necessário para incluir o banco de dados
+      resources: [User, Product],  // Adicione aqui seus recursos (modelos)
+      rootPath: '/admin',
     });
 
-    const { default: buildRouter } = AdminJSExpress;
-    const adminJsRouter = buildRouter(adminJs);
+    // Configuração da autenticação para o painel
+    const adminJsRouter = AdminJSExpress.buildAuthenticatedRouter(
+      adminJs,
+      {
+        authenticate: async (email, password) => {
+          // Validar as credenciais para o painel admin
+          const user = await User.findOne({ where: { email } });
+          if (user && password === process.env.ADMIN_PASSWORD) {
+            return user; // Retorna o usuário para autenticação
+          }
+          return null; // Se não encontrado ou senha incorreta
+        },
+        cookiePassword: process.env.COOKIE_SECRET || 'uma-senha-secreta',
+      },
+      null,
+      {
+        resave: false,
+        saveUninitialized: true,
+        secret: process.env.COOKIE_SECRET || 'uma-senha-secreta',
+      }
+    );
 
-    // Protegendo o painel AdminJS com middleware
-    app.use('/admin', adminAuthMiddleware, adminJsRouter);
+    // Protegendo o painel AdminJS com o middleware de autenticação JWT
+    app.use(adminJs.options.rootPath, adminAuthMiddleware, adminJsRouter);
 
-    console.log('AdminJS configurado com sucesso! Acesse http://localhost:5000/admin');
+    console.log(`AdminJS configurado com sucesso! Acesse http://localhost:${PORT}/admin`);
   } catch (err) {
     console.error('Erro ao configurar AdminJS:', err);
   }
@@ -54,30 +71,54 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 
+// Usar express.json() após as rotas do AdminJS
+app.use(express.json());  // Usando express.json() no lugar de body-parser
+
 // Sincroniza as tabelas no banco de dados
 const syncDatabase = async () => {
   try {
-    await User.sync();
-    await Product.sync();
+    await User.sync();     // Sincroniza a tabela User
+    await Product.sync();  // Sincroniza a tabela Product
     console.log('Tabelas criadas ou atualizadas com sucesso.');
   } catch (error) {
     console.error('Erro ao criar ou atualizar as tabelas:', error);
   }
 };
+
 syncDatabase();
 
 // Rota para cadastro de usuários
 app.post('/api/cadastro', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+
+    // Verificar se o e-mail já está em uso
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Email já está em uso!' });
     }
 
+    // Hash da senha
     const hashedPassword = await bcrypt.hash(password, 8);
-    const newUser = await User.create({ name, email, password: hashedPassword });
-    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user: newUser });
+
+    // Criar novo usuário com o papel informado
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || 'user', // Se não for fornecido, assume 'user' como default
+    });
+
+    // Resposta ao cliente
+    res.status(201).json({
+      message: 'Usuário cadastrado com sucesso!',
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,  // Retorna o role no objeto do usuário
+      },
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -88,22 +129,29 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Email ou senha inválidos!' });
     }
 
+    // Agora o role do usuário é incluído no token
+    const role = user.role; // O papel do usuário vem do banco de dados
+
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role },  // Inclua role no payload do JWT
       process.env.JWT_SECRET || 'seu_segredo',
       { expiresIn: '1h' }
     );
+    
 
+    // Retorna o token e os dados do usuário, incluindo o role
     res.json({
-      token,
+      token,  // Token com role incluído
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: role  // Inclui o role no retorno da resposta
       },
     });
   } catch (err) {

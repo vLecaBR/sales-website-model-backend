@@ -1,8 +1,14 @@
 // models/Product.js
-const { Sequelize, DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');  // IMPORTANTE: Importar a instância do sequelize
 
 const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -12,17 +18,12 @@ const Product = sequelize.define('Product', {
     allowNull: false,
   },
   description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
+    type: DataTypes.STRING,
   },
-  conteudoCaixa: {
-    type: DataTypes.JSON, // Se estiver usando um array, o tipo JSON é adequado
-    allowNull: false,
+  stock: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
-  image: {
-    type: DataTypes.STRING, // Adicionando o campo image
-    allowNull: true, // O campo pode ser opcional
-  }
 });
 
 module.exports = Product;

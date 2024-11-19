@@ -1,5 +1,4 @@
 // middlewares/adminAuthMiddleware.js
-
 const jwt = require('jsonwebtoken');
 
 // Middleware para autenticação de administradores no AdminJS
@@ -15,7 +14,7 @@ const adminAuthMiddleware = async (req, res, next) => {
     const user = jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo');
     
     // Verifica se o usuário é administrador
-    if (user.role !== 'admin') {
+    if (user.role !== 'admin') { // Aqui é onde a verificação ocorre
       return res.status(403).json({ message: 'Acesso negado. Somente administradores podem acessar.' });
     }
 
