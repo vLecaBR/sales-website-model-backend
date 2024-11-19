@@ -6,10 +6,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { connectDB } = require('./config/database');
 const User = require('./models/User');
-const Product = require('./models/Product'); // Importando o modelo de produto
+const Product = require('./models/Product');
 const userRoutes = require('./routes/userRoutes');
-const productRoutes = require('./routes/productRoutes'); // Importando as rotas de produtos
-const authenticateToken = require('./middlewares/authMiddleware'); // Middleware de autenticação JWT
+const productRoutes = require('./routes/productRoutes');
+const authenticateToken = require('./middlewares/authMiddleware');
+const adminAuthMiddleware = require('./middlewares/adminAuthMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,47 +21,34 @@ app.use(bodyParser.json());
 // Conectar ao banco de dados
 connectDB();
 
-// Configuração do AdminJS com autenticação JWT
+// Configuração do AdminJS com autenticação
 (async () => {
-  const AdminJS = (await import('adminjs')).default;
-  const AdminJSExpress = (await import('@adminjs/express')).default;
+  try {
+    const { default: AdminJS } = await import('adminjs');
+    const AdminJSExpress = await import('@adminjs/express');
+    const AdminJSSequelize = await import('@adminjs/sequelize');
 
-  // Configuração do painel AdminJS
-  const adminJs = new AdminJS({
-    resources: [User, Product],
-    rootPath: '/admin',
-  });
+    // Registrar o adaptador do Sequelize
+    AdminJS.registerAdapter(AdminJSSequelize);
 
-  // Middleware para autenticação de administradores no AdminJS
-  const adminAuthMiddleware = async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    // Configuração do painel AdminJS
+    const adminJs = new AdminJS({
+      databases: [], // Pode ser usado para conectar o banco inteiro
+      resources: [User, Product], // Modelos que aparecerão no painel
+      rootPath: '/admin',         // Caminho do painel
+    });
 
-    if (!token) {
-      return res.status(401).json({ message: 'Token não fornecido.' });
-    }
+    const { default: buildRouter } = AdminJSExpress;
+    const adminJsRouter = buildRouter(adminJs);
 
-    try {
-      const user = jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo');
-      
-      // Verifica se o usuário é administrador
-      if (user.role !== 'admin') {
-        return res.status(403).json({ message: 'Acesso negado. Somente administradores podem acessar.' });
-      }
+    // Protegendo o painel AdminJS com middleware
+    app.use('/admin', adminAuthMiddleware, adminJsRouter);
 
-      req.user = user;
-      next();
-    } catch (err) {
-      return res.status(403).json({ message: 'Token inválido.' });
-    }
-  };
-
-  // Define o AdminJS com o middleware de autenticação
-  const adminJsRouter = AdminJSExpress.buildRouter(adminJs);
-  app.use('/admin', adminAuthMiddleware, adminJsRouter); // Protege a rota admin com autenticação
-})().catch(err => {
-  console.error("Erro ao carregar AdminJS:", err);
-});
+    console.log('AdminJS configurado com sucesso! Acesse http://localhost:5000/admin');
+  } catch (err) {
+    console.error('Erro ao configurar AdminJS:', err);
+  }
+})();
 
 // Usar rotas de usuários e produtos
 app.use('/api/users', userRoutes);
@@ -100,12 +88,12 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
-    if (!user || !await bcrypt.compare(password, user.password)) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Email ou senha inválidos!' });
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role }, // Inclui o role no token
+      { id: user.id, role: user.role },
       process.env.JWT_SECRET || 'seu_segredo',
       { expiresIn: '1h' }
     );
