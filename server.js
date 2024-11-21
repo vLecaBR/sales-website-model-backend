@@ -148,19 +148,19 @@ connectDB().then(() => {
     app.post('/api/products', authenticateToken, async (req, res) => {
       try {
         const { name, price, description, conteudoCaixa, image } = req.body;
-
+    
         if (!name || !price) {
           return res.status(400).json({ message: 'Nome e preço são obrigatórios!' });
         }
-
+    
         const newProduct = await Product.create({
           name,
           price,
           description,
-          conteudoCaixa,
+          conteudoCaixa: Array.isArray(conteudoCaixa) ? conteudoCaixa : [], // Garante que é um array
           image,
         });
-
+    
         res.status(201).json({
           message: 'Produto criado com sucesso!',
           product: newProduct,
@@ -169,7 +169,7 @@ connectDB().then(() => {
         console.error(err);
         res.status(500).json({ message: 'Erro ao criar o produto.' });
       }
-    });
+    });    
 
     // Rota de login
     app.post('/api/login', async (req, res) => {
