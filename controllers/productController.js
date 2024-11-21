@@ -32,9 +32,10 @@ exports.createProduct = async (req, res) => {
 
     // Garantindo que conteudoCaixa seja um array, caso venha como string separada por vírgulas
     const formattedConteudoCaixa = Array.isArray(conteudoCaixa)
-      ? conteudoCaixa
-      : conteudoCaixa ? conteudoCaixa.split(',').map(item => item.trim()) : [];
+      ? conteudoCaixa // Se já for um array, usa diretamente
+      : conteudoCaixa ? conteudoCaixa.split(',').map(item => item.trim()) : []; // Caso seja string, transforma em array
 
+    // Criando o novo produto no banco
     const newProduct = await Product.create({
       name,
       price,
@@ -62,10 +63,10 @@ exports.updateProduct = async (req, res) => {
 
     // Garantindo que conteudoCaixa seja um array, caso venha como string separada por vírgulas
     const updatedConteudoCaixa = Array.isArray(conteudoCaixa)
-      ? conteudoCaixa
-      : conteudoCaixa ? conteudoCaixa.split(',').map(item => item.trim()) : [];
+      ? conteudoCaixa // Se já for um array, usa diretamente
+      : conteudoCaixa ? conteudoCaixa.split(',').map(item => item.trim()) : []; // Caso seja string, transforma em array
 
-    // Atualizando o produto com os dados fornecidos
+    // Atualizando o produto com os novos dados
     await product.update({
       name,
       price,
