@@ -43,7 +43,26 @@ connectDB().then(() => {
     // Criação da instância do AdminJS
     const adminJs = new AdminJS({
       databases: [sequelize], // Conexão com o banco de dados
-      resources: [User, Product], // Recursos para o AdminJS
+      resources: [
+        {
+          resource: User,
+          options: {
+            listProperties: ['id', 'name', 'email', 'role'], // Campos exibidos na lista
+            editProperties: ['name', 'email', 'password', 'role'], // Campos exibidos na edição
+            filterProperties: ['name', 'email', 'role'], // Campos para filtragem
+            showProperties: ['id', 'name', 'email', 'role'], // Campos exibidos na visualização
+          },
+        },
+        {
+          resource: Product,
+          options: {
+            listProperties: ['id', 'name', 'price', 'description'], // Campos exibidos na lista
+            editProperties: ['name', 'price', 'description', 'conteudoCaixa', 'image'], // Campos exibidos na edição
+            filterProperties: ['name', 'price'], // Campos para filtragem
+            showProperties: ['id', 'name', 'price', 'description', 'conteudoCaixa', 'image'], // Campos exibidos na visualização
+          },
+        },
+      ], // Recursos para o AdminJS
       rootPath: '/admin', // Caminho de acesso ao AdminJS
     });
 
