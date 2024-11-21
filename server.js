@@ -40,33 +40,46 @@ connectDB().then(() => {
 
     AdminJS.registerAdapter(AdminJSSequelize);
 
-    // Criação da instância do AdminJS
     const adminJs = new AdminJS({
       databases: [sequelize], // Conexão com o banco de dados
       resources: [
         {
-          resource: User,
-          options: {
-            listProperties: ['id', 'name', 'email', 'role'], // Campos exibidos na lista
-            editProperties: ['name', 'email', 'password', 'role'], // Campos exibidos na edição
-            filterProperties: ['name', 'email', 'role'], // Campos para filtragem
-            showProperties: ['id', 'name', 'email', 'role'], // Campos exibidos na visualização
-          },
-        },
-        {
           resource: Product,
           options: {
-            listProperties: ['id', 'name', 'price', 'description'], // Campos exibidos na lista
-            editProperties: ['name', 'price', 'description', 'conteudoCaixa', 'image'], // Campos exibidos na edição
-            filterProperties: ['name', 'price'], // Campos para filtragem
-            showProperties: ['id', 'name', 'price', 'description', 'conteudoCaixa', 'image'], // Campos exibidos na visualização
-          },
+            listProperties: ['id', 'name', 'price', 'description', 'conteudoCaixa'],
+            editProperties: ['name', 'price', 'description', 'conteudoCaixa', 'image'],
+            filterProperties: ['name', 'price'],
+            showProperties: ['id', 'name', 'price', 'description', 'conteudoCaixa', 'image'],
+            properties: {
+              conteudoCaixa: {
+                type: 'textarea', // Exibe como um campo de texto
+                isMultiline: true, // Permite várias linhas no campo de edição
+                custom: {
+                  // Ao exibir os dados, converte o conteúdo JSONB para uma string com cada item em uma nova linha
+                  parse: (value) => {
+                    if (Array.isArray(value)) {
+                      return value.join('\n'); // Exibe como uma lista de itens
+                    }
+                    return ''; // Se não houver dados, retorna vazio
+                  },
+                  // Ao salvar, converte a string de volta para um array JSON
+                  format: (value) => {
+                    if (value) {
+                      return value.split('\n').map(item => item.trim()); // Converte a string de volta para um array de strings
+                    }
+                    return []; // Caso não haja dados, retorna um array vazio
+                  }
+                }
+              },
+            },
+          }
         },
-      ], // Recursos para o AdminJS
-      rootPath: '/admin', // Caminho de acesso ao AdminJS
+        { resource: User, options: {} },
+      ],
+      rootPath: '/admin',
     });
 
-    // Criação da rota do AdminJS com autenticação
+    // Rota de autenticação do AdminJS
     const adminJsRouter = AdminJSExpress.buildAuthenticatedRouter(
       adminJs,
       {
