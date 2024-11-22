@@ -71,6 +71,10 @@ connectDB().then(() => {
                   }
                 }
               },
+              description: {
+                type: 'textarea', // Exibe como um campo de texto
+                isMultiline: true, // Permite várias linhas no campo de edição
+              }
             },
           }
         },
