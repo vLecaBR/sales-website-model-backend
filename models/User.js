@@ -1,14 +1,14 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');  // Certifique-se de que o sequelize está sendo importado corretamente
+const { sequelize } = require('../config/database');  //! Certifique-se de que o sequelize está sendo importado corretamente
 
-const User = sequelize.define('User', {
+const User = sequelize.define('User', { //! Define o modelo User
   name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
-    unique: true,  // Garantir que o email seja único
+    unique: true,  //! Garantir que o email seja único
     allowNull: false,
   },
   password: {
@@ -17,7 +17,7 @@ const User = sequelize.define('User', {
   },
   role: {
     type: DataTypes.STRING,
-    defaultValue: 'user',  // O padrão será "user", mas pode ser "admin" ou outro
+    defaultValue: 'user',  //! O padrão será "user", mas pode ser "admin" ou outro
     allowNull: false,
   },
 });

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');  // Certifique-se de que o sequelize está sendo importado corretamente
+const { sequelize } = require('../config/database');  //! Certifique-se de que o sequelize está sendo importado corretamente
 
-const Product = sequelize.define('Product', {
+const Product = sequelize.define('Product', { //! Define o modelo Product
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -15,7 +15,7 @@ const Product = sequelize.define('Product', {
     allowNull: true,
   },
   conteudoCaixa: {
-    type: DataTypes.JSONB,  // Usando JSONB para armazenar lista de itens na caixa
+    type: DataTypes.JSONB,  //! Usando JSONB para armazenar lista de itens na caixa
     allowNull: true,
   },
   image: {
