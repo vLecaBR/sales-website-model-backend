@@ -27,5 +27,5 @@ const adminRouter = AdminJSExpress.buildAuthenticatedRouter( //! Cria o roteador
   }
 );
 
-//!Alice@2110 Exporta o roteador para ser utilizado no arquivo principal (server.js)
+//! Exporta o roteador para ser utilizado no arquivo principal (server.js)
 module.exports = adminRouter;
