@@ -1,8 +1,8 @@
 // routes/userRoutes.js
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const express = require('express'); //! Importa o express
+const router = express.Router(); //! Cria um objeto de rotas
+const userController = require('../controllers/userController'); //! Importa o controller de usuários
+const authMiddleware = require('../middlewares/authMiddleware'); //! Importa o middleware de autenticação
 
 //! Rotas de usuários
 router.post('/cadastro', userController.register); //! Rota pública

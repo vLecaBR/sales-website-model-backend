@@ -27,8 +27,8 @@ const updateUser = async (token, name, email, password) => { //! Função para a
   const user = await User.findByPk(decoded.id); //! Busca o usuário pelo ID
   if (!user) throw new Error('Usuário não encontrado!'); //! Caso o usuário não seja encontrado
 
-  user.name = name; 
-  user.email = email;
+  user.name = name; //! Atualiza o nome do usuário
+  user.email = email; //! Atualiza o email do usuário
   if (password) user.password = await bcrypt.hash(password, 8); //! Caso a senha seja informada, criptografa a senha
   await user.save(); //! Salva as alterações no banco de dados
   return { id: user.id, name: user.name, email: user.email }; //! Retorna o usuário atualizado
