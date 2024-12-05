@@ -13,7 +13,7 @@ let sequelize; //! Define a variável sequelize
 if (config.use_env_variable) { //! Verifica se existe uma variável de ambiente para o banco de dados
   sequelize = new Sequelize(process.env[config.use_env_variable], config); //! Conecta ao banco de dados com a variável de ambiente
 } else { //! Caso não tenha variável de ambiente, conecta com as configurações do arquivo config.json
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(config.database, config.username, config.password, config); //! Conecta ao banco de dados com as configurações do arquivo config.json
 }
 
 fs
@@ -37,7 +37,7 @@ Object.keys(db).forEach(modelName => { //! Para cada model, verifica se existe a
   }
 });
 
-db.sequelize = sequelize;
+db.sequelize = sequelize; //! Adiciona a instância do sequelize ao objeto db
 db.Sequelize = Sequelize;
 
 module.exports = db;
