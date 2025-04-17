@@ -58,8 +58,8 @@ Security Enhancements: Implementing additional security practices, such as rate 
 
 📬 Contact
 If you have any questions or suggestions about this project, feel free to reach out:
-Email: vitartasleca@gmail.com
-LinkedIn: https://www.linkedin.com/in/victor-leca-vlkbr/ <br>
+Email: vitartasleca@gmail.com <br>
+LinkedIn: [LinkedIn](https://www.linkedin.com/in/victor-leca-vlkbr/) <br>
 
 Note: This project was developed for educational purposes and as part of my personal portfolio. It does not include real payment processing or order handling. <br>
 
