@@ -57,7 +57,7 @@ Product Management: Features to add, edit, and delete products from the catalog.
 Security Enhancements: Implementing additional security practices, such as rate limiting and stricter input validation. <br>
 
 📬 Contact
-If you have any questions or suggestions about this project, feel free to reach out:
+If you have any questions or suggestions about this project, feel free to reach out: <br>
 Email: vitartasleca@gmail.com <br>
 LinkedIn: [LinkedIn](https://www.linkedin.com/in/victor-leca-vlkbr/) <br>
 
