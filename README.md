@@ -1,69 +1,159 @@
-<h1>E-commerce Project Backend</h1><br>
-This repository contains the source code for the backend of an e-commerce project, developed using Node.js and SQLite. The goal is to provide basic user authentication and management functionalities, allowing users to register, log in, and update their information.
+# 🇧🇷 README em Português
+# 🛒 E-commerce Project Backend - Projeto de Portfólio
 
-📋 Features
+Este repositório contém o código-fonte do backend de um projeto de e-commerce, desenvolvido utilizando Node.js e SQLite. O objetivo é fornecer funcionalidades básicas de autenticação e gerenciamento de usuários, permitindo que os usuários se registrem, façam login e atualizem suas informações.
 
-User Registration: Allows new users to sign up with their name, email, and password.
+---
 
-Login: Users can authenticate using email and password, receiving a JWT token.
+### ✨ Funcionalidades
 
-User Information Update: Authenticated users can update their personal details.
+- 📝 **Cadastro de Usuários**: Permite que novos usuários se cadastrem com nome, email e senha  
+- 🔑 **Login**: Usuários podem se autenticar usando email e senha, recebendo um token JWT  
+- ✏️ **Atualização de Informações do Usuário**: Usuários autenticados podem atualizar seus dados pessoais  
+- 🔒 **Proteção de Rotas**: Rotas sensíveis são protegidas por autenticação, garantindo que apenas usuários logados possam acessá-las
 
-Route Protection: Sensitive routes are protected by authentication, ensuring only logged-in users can access them. <br>
+---
 
-🛠️ Technologies Used
+### 🛠️ Tecnologias Utilizadas
 
-Node.js: JavaScript runtime environment for server-side development.
+- **Node.js** – Ambiente de execução JavaScript para desenvolvimento do servidor  
+- **Express** – Framework web para construção de APIs de forma rápida e eficiente  
+- **SQLite** – Banco de dados leve e incorporado, ideal para desenvolvimento e prototipagem  
+- **JSON Web Token (JWT)** – Utilizado para autenticação de usuários  
+- **dotenv** – Carrega variáveis de ambiente a partir de um arquivo `.env`, mantendo a configuração segura  
 
-Express: Web framework for building APIs quickly and efficiently.
+---
 
-SQLite: Lightweight, embedded database, ideal for development and prototyping.
+### ⚙️ Como Rodar o Projeto
 
-JSON Web Token (JWT): Used for user authentication.
+#### Pré-requisitos
 
-dotenv: Loads environment variables from a .env file to keep configuration secure. <br>
+Certifique-se de que o Node.js esteja instalado na sua máquina. Para verificar, utilize o comando:
 
-⚙️ How to Run the Project
-Prerequisites
-Make sure you have Node.js installed on your machine. You can check with the following command:
 node -v
 
-Step-by-Step
+#### Passo a passo
 
-Clone this repository to your local machine:
-git clone https://github.com/vLecaBR/sales-website-model-backend
+1. Clone este repositório em sua máquina local:  
+   git clone https://github.com/vLecaBR/sales-website-model-backend
 
-Navigate to the project folder:
-cd backend
+2. Acesse a pasta do projeto:  
+   cd backend
 
-Install the dependencies:
-npm install
+3. Instale as dependências:  
+   npm install
 
-Create a .env file in the root directory of the project and add your necessary environment variables (e.g., JWT_SECRET).
+4. Crie um arquivo `.env` no diretório raiz do projeto e adicione suas variáveis de ambiente necessárias (exemplo: JWT_SECRET).
 
-Start the server:
-node server.js
+5. Inicie o servidor:  
+   node server.js
 
-The server will be running at http://localhost:5000. <br>
+O servidor estará rodando em: http://localhost:5000
 
-💡 Potential Future Improvements
+---
 
-Payment API Integration: For handling real transactions.
+### 💡 Melhorias Futuras
 
-Notification System: To alert users about account updates or promotions.
+- Integração com API de pagamento para transações reais  
+- Sistema de Notificações: Alerta os usuários sobre atualizações de conta ou promoções  
+- Gerenciamento de Produtos: Funcionalidades para adicionar, editar e excluir produtos do catálogo  
+- Melhorias em Segurança: Implementação de práticas de segurança adicionais, como limitação de taxa e validação mais rigorosa de entradas  
 
-Product Management: Features to add, edit, and delete products from the catalog.
+---
 
-Security Enhancements: Implementing additional security practices, such as rate limiting and stricter input validation. <br>
+### 📬 Contato
 
-📬 Contact
-If you have any questions or suggestions about this project, feel free to reach out: <br>
-Email: vitartasleca@gmail.com <br>
-LinkedIn: [LinkedIn](https://www.linkedin.com/in/victor-leca-vlkbr/) <br>
+- Email: vitartasleca@gmail.com  
+- LinkedIn: https://www.linkedin.com/in/victor-leca-vlkbr/
 
-Note: This project was developed for educational purposes and as part of my personal portfolio. It does not include real payment processing or order handling. <br>
+---
 
-License
-This project is licensed under the MIT License. <br>
+> ℹ️ Este projeto foi desenvolvido para fins educacionais e de portfólio. Não possui processamento real de pagamentos ou gerenciamento de pedidos.
 
-I hope this project helps demonstrate my skills and serves as inspiration for anyone looking to build their own e-commerce backend!
+---
+
+### 📄 Licença
+
+Este projeto está licenciado sob a Licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
+
+---
+---
+---
+
+# 🇺🇸 README in English
+# 🛒 E-commerce Project Backend - Portfolio Project
+
+This repository contains the source code for the backend of an e-commerce project, developed using Node.js and SQLite. The goal is to provide basic user authentication and management functionalities, allowing users to register, log in, and update their information.
+
+---
+
+### ✨ Features
+
+- 📝 **User Registration**: Allows new users to sign up with their name, email, and password  
+- 🔑 **Login**: Users can authenticate using email and password, receiving a JWT token  
+- ✏️ **User Information Update**: Authenticated users can update their personal details  
+- 🔒 **Route Protection**: Sensitive routes are protected by authentication, ensuring only logged-in users can access them
+
+---
+
+### 🛠️ Technologies Used
+
+- **Node.js** – JavaScript runtime environment for server-side development  
+- **Express** – Web framework for building APIs quickly and efficiently  
+- **SQLite** – Lightweight, embedded database, ideal for development and prototyping  
+- **JSON Web Token (JWT)** – Used for user authentication  
+- **dotenv** – Loads environment variables from a `.env` file to keep configuration secure  
+
+---
+
+### ⚙️ How to Run the Project
+
+#### Prerequisites
+
+Make sure you have Node.js installed on your machine. You can check with the following command:
+
+node -v
+
+#### Steps
+
+1. Clone the repository to your local machine:  
+   git clone https://github.com/vLecaBR/sales-website-model-backend
+
+2. Navigate to the project folder:  
+   cd backend
+
+3. Install the dependencies:  
+   npm install
+
+4. Create a `.env` file in the root directory of the project and add your necessary environment variables (e.g., JWT_SECRET).
+
+5. Start the server:  
+   node server.js
+
+The server will be running at: http://localhost:5000
+
+---
+
+### 💡 Potential Future Improvements
+
+- Payment API integration for handling real transactions  
+- Notification System: To alert users about account updates or promotions  
+- Product Management: Features to add, edit, and delete products from the catalog  
+- Security Enhancements: Implementing additional security practices, such as rate limiting and stricter input validation  
+
+---
+
+### 📬 Contact
+
+- Email: vitartasleca@gmail.com  
+- LinkedIn: https://www.linkedin.com/in/victor-leca-vlkbr/
+
+---
+
+> ℹ️ This project was developed for educational purposes and portfolio use. It does not include real payment processing or order handling.
+
+---
+
+### 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
