@@ -74,7 +74,7 @@ O servidor estará rodando em: http://localhost:5000
 
 ### 📄 Licença
 
-Este projeto está licenciado sob a Licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
+Este projeto foi desenvolvido para fins educacionais e uso de portfólio. Entrar em contato em caso de querer utilizar.
 
 ---
 ---
@@ -156,4 +156,5 @@ The server will be running at: http://localhost:5000
 
 ### 📄 License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project was developed for educational purposes and portfolio use. Please contact us if you would like to use it.
+
